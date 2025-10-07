@@ -19,6 +19,18 @@ Backend em **Flask + MySQL** para o sistema **Vitrine de Feiras**.
 | Infraestrutura Dev | **Docker Compose (app, db, adminer, .env)** | — | 🔜 pendente |
 
 ---
+## 🧩 Estrutura do Código-Fonte (`src/`)
+
+O backend segue o padrão **MVC (Model–View–Controller)** adaptado para APIs Flask.
+
+| Camada | Função | Local |
+|--------|---------|--------|
+| **Model** | Define entidades e tabelas com SQLAlchemy | `src/models/` |
+| **Service** | Implementa regras de negócio | `src/services/` |
+| **Controller** | Gera endpoints e responde HTTP (JSON) | `src/controllers/` |
+| **View** | No backend, é a resposta JSON para o frontend | — |
+
+📘 [Ver README técnico da pasta `src/`](./src/README.md)
 
 ## 🚀 Executar localmente
 
