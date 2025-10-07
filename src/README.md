@@ -5,23 +5,13 @@ Este diretório contém o **código-fonte principal** do backend da aplicação 
 ---
 
 ## 🗂️ Estrutura de Pastas
-src/
-│
-├── app.py # Ponto de entrada da aplicação (App Factory Flask)
-│
-├── controllers/ # Controladores: lidam com requisições HTTP (rotas)
-│ └── produtos_controller.py
-│
-├── services/ # Serviços: contêm regras de negócio (CRUD, validações)
-│ └── produtos_service.py
-│
-├── models/ # Modelos de dados (ORM SQLAlchemy → MySQL)
-│
-├── schemas/ # Validação de dados (Pydantic ou Marshmallow)
-│
-└── core/ # Configurações globais e utilitários (CORS, logs, etc)
-
----
+📁 src/  
+│ ├── app.py → ponto de entrada da aplicação (App Factory Flask)  
+│ ├── controllers/ → controladores (rotas HTTP)  
+│ ├── services/ → regras de negócio (CRUD, validações)  
+│ ├── models/ → modelos ORM (SQLAlchemy → MySQL)  
+│ ├── schemas/ → validação de dados (Pydantic ou Marshmallow)  
+│ └── core/ → configurações globais (CORS, logs, etc)
 
 ## ⚙️ Arquitetura e Responsabilidades
 
