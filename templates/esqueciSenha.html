@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>login</title>
+</head>
+<body>
+    <h1>TELA ESQUECI A MINHA SENHA</h1>
+    <div class="container">
+            <label for="email"><b>Email:</b></label>
+            <input type="text" placeholder="Digite seu email" name="email" required>
+            <br>
+            <label for="cpf"><b>cpf/cnpj:</b></label>
+            <input type="text" placeholder="Digite seu CPF OU CNPJ" name="cpf" required>
+        </div>
+        <br>
+        <div class="container" style="background-color: #f1f1f1">
+        <button type="submit" class="confirmar">confirmar</button>       
+        <button type="button" class="cancelar"><a href="{{url_for('home.login_feirante')}}">cancelar</a></button>       
+        
+    </div>
+
+</body>
+</html>

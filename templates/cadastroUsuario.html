@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>login</title>
+</head>
+<body>
+    <h1> TELA DE CADASTRO USUARIO</h1>
+    <div class="container">
+            <label for="nome"><b>Nome:</b></label>
+            <input type="text" placeholder="Digite seu nome" name="nome" required>
+            <br>
+            <label for="email"><b>Email:</b></label>
+            <input type="text" placeholder="Digite seu email" name="email" required>
+            <br>
+            <label for="senha"><b>Senha:</b></label>
+            <input type="password" placeholder="Digite uma senha" name="senha" required>
+            <label for="confirme_senha"><b>Confirme a Senha:</b></label>
+            <input type="password" placeholder="Confirme a senha" name="confirme_senha" required>
+            <br>
+            <label for="cpf"><b>CPF / CNPJ:</b></label>
+            <input type="text" placeholder="Digite o CPF OU CNPJ" name="cpf" required>
+            <label for="email"><b>Telefone:</b></label>
+            <input type="text" placeholder="Digite o telefone de contato" name="telefone" required>
+    </div>
+    <br>
+    <div class="container" style="background-color: #f1f1f1">
+         <button type="submit" class="confirmar"><a href="{{url_for('home.login_feirante')}}">confirmar</a></button>       
+        <button type="button" class="cancelar"><a href="{{url_for('home.login_feirante')}}">cancelar</a></button>
+    </div>
+
+</body>
+</html>
