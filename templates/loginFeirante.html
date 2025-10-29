@@ -14,11 +14,13 @@
             <label for="senha"><b>Senha:</b></label>
             <input type="password" placeholder="Digite sua senha" name="senha" required>
             <br>
-            <button ><a href="{{url_for('home.menu_usuario')}}">Login</a></button>       
+            <button><a href="{{ url_for('home.menu_usuario') }}">Login</a></button>       
     </div>
     <br>
     <div class="container" style="background-color: #f1f1f1">
-        <span class="cadastroUsuario"><a href="{{url_for('home.cadastro_usuario')}}">Cadastre-se</a></span>
+<span class="cadastroUsuario">
+  <a href="{{ url_for('usuario.formulario_usuario') }}">Cadastre-se</a>
+</span>
         <br>
         <span class="senha">Esqueceu a <a href="{{url_for('home.esqueci_senha')}}">Senha?</a></span>
     </div>
