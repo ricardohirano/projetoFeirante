@@ -1,0 +1,20 @@
+<tr id="usuario-{{ usuario.id }}">
+  <th scope="row">{{ usuario.id }}</th>
+  <td>{{ usuario.nome }}</td>
+  <td>{{ usuario.email }}</td>
+  <td>{{ usuario.tipo }}</td>
+  <td>
+    <button
+      hx-get="{{ url_for('usuario.editar_usuario', usuario_id=usuario.id) }}"
+      hx-target="closest tr"
+      hx-swap="outerHTML"
+    >Editar</button>
+
+    <button
+      hx-delete="{{ url_for('usuario.excluir_usuario', usuario_id=usuario.id) }}"
+      hx-target="#usuario-{{ usuario.id }}"
+      hx-swap="outerHTML"
+      hx-confirm="Tem certeza que deseja excluir?"
+    >Deletar</button>
+  </td>
+</tr>
