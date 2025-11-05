@@ -3,32 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>login</title>
+    <title>Cadastro de Usuário</title>
 </head>
 <body>
-    <h1> TELA DE CADASTRO USUARIO</h1>
-    <div class="container">
-            <label for="nome"><b>Nome:</b></label>
-            <input type="text" placeholder="Digite seu nome" name="nome" required>
-            <br>
-            <label for="email"><b>Email:</b></label>
-            <input type="email" placeholder="Digite seu email" name="email" required>
-            <br>
-            <label for="senha"><b>Senha:</b></label>
-            <input type="password" placeholder="Digite uma senha" name="senha" required>
-            <label for="confirme_senha"><b>Confirme a Senha:</b></label>
-            <input type="password" placeholder="Confirme a senha" name="confirme_senha" required>
-            <br>
-            <label for="cpf"><b>CPF / CNPJ:</b></label>
-            <input type="text" placeholder="Digite o CPF OU CNPJ" name="cpf" required>
-            <label for="telefone"><b>Telefone:</b></label>
-            <input type="text" placeholder="Digite o telefone de contato" name="telefone" required>
-    </div>
-    <br>
-    <div class="container" style="background-color: #f1f1f1">
-         <button type="submit" class="confirmar"><a href="{{url_for('home.login_feirante')}}">confirmar</a></button>       
-        <button type="button" class="cancelar"><a href="{{url_for('home.login_feirante')}}">cancelar</a></button>
-    </div>
+    <h1>TELA DE CADASTRO USUARIO</h1>
 
+    <form 
+        action="{{ url_for('usuario.cadastrar_usuario') }}" 
+        method="POST"
+    >
+        <div>
+            <label for="nome"><b>Nome:</b></label>
+            <input 
+                type="text" 
+                placeholder="Digite seu nome" 
+                name="nome" 
+                required
+            >
+        </div>
+        <br>
+        <div>
+            <label for="email"><b>Email:</b></label>
+            <input 
+                type="email" 
+                placeholder="Digite seu email" 
+                name="email" 
+                required
+            >
+        </div>
+        
+        <div>
+            <label for="confirme_email"><b>Confirme o Email:</b></label>
+            <input 
+                type="email" 
+                placeholder="Digite seu email novamente" 
+                name="confirme_email" 
+                required
+            >
+        </div>
+        <br>
+        <div>
+            <label for="senha"><b>Senha:</b></label>
+            <input 
+                type="password" 
+                placeholder="Digite uma senha" 
+                name="senha" 
+                required
+            >
+        </div>
+        <div>
+            <label for="confirme_senha"><b>Confirme a Senha:</b></label>
+            <input 
+                type="password" 
+                placeholder="Confirme a senha" 
+                name="confirme_senha" 
+                required
+            >
+        </div>
+        <br>
+        <div>
+            <label for="cpf"><b>CPF / CNPJ:</b></label>
+            <input 
+                type="text" 
+                placeholder="Digite o CPF OU CNPJ" 
+                name="cpf" 
+                required
+            >
+        </div>
+        <div>
+            <label for="telefone"><b>Telefone:</b></label>
+            <input 
+                type="text" 
+                placeholder="Digite o telefone de contato" 
+                name="telefone" 
+                required
+            >
+        </div>
+        
+        <br>
+        
+        <div>
+            <button type="submit">Confirmar Cadastro</button>
+            <a href="{{ url_for('home.login_feirante') }}">
+                <button type="button">Cancelar</button>
+            </a>
+        </div>
+    </form>
 </body>
 </html>

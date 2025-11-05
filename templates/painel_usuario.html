@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Painel do Usuário</title>
+</head>
+<body>
+    <div>
+        <nav>
+            <a href="{{ url_for('home.logout') }}">
+                ← Sair (Logout)
+            </a>
+            
+            <hr>
+            
+            <div>
+                {% for link in menu %}
+                    <a href="{{ link.url }}">
+                        {{ link.titulo }}
+                    </a>
+                    <br> {% endfor %}
+            </div>
+        </nav>
+        
+        <hr>
+        
+        <main>
+            <h1>Bem vindo {{ usuario.nome }}</h1>
+            
+            <div>
+                <div>
+                  Numero de Visualizações: {{ stats.visualizacoes }}
+                </div>
+                <div>
+                  Numeros de Gostei: {{ stats.gostei }}
+                </div>
+                <div>
+                  Numero de Favoritos: {{ stats.favoritos }}
+                </div>
+                <div>
+                  Dias Premium: {{ stats.dias_premium }}
+                </div>
+            </div>
+            
+            <div>
+                <button 
+                  type="button"
+                  disabled 
+                  title="Função a ser implementada"
+                >
+                    Solicitar Premium
+                </button>
+                <button 
+                  type="button"
+                  disabled 
+                  title="Função a ser implementada"
+                >
+                    Pagar Premium
+                </button>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
