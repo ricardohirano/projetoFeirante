@@ -4,7 +4,87 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lista de Usuários (moderadores)</title>
-  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <script>
+    /*
+    Troca as linhas por inputs 
+    */
+    function editarUsuario(id) {
+      // CORREÇÃO 1: 'document.getElementById'
+      const linha = document.getElementById(`usuario-${id}`);
+      
+      // Se linha for null, o erro vai acontecer aqui
+      const nome = linha.querySelector(".coluna-nome").innerText;
+      const email = linha.querySelector(".coluna-email").innerText;
+      const tipo = linha.querySelector(".coluna-tipo").innerText;
+
+      linha.innerHTML = `
+      <th>${id}</th>
+      <td><input value="${nome}" id="nome-${id}" /></td>
+      <td><input value="${email}" id="email-${id}" /></td>
+      <td>
+        <select id="tipo-${id}">
+          <option ${tipo === "suporte" ? "selected" : ""}>suporte</option>
+          <option ${tipo === "moderador" ? "selected" : ""}>moderador</option>
+          <option ${tipo === "feirante" ? "selected" : ""}>feirante</option>
+        </select>  
+      </td>
+      <td>
+        <button onclick="salvarUsuario(${id})">Salvar</button>
+        <button onclick="cancelarEdicao(${id})">Cancelar</button>
+      </td>
+      `;
+    }
+    
+    /*
+    Atualiza o usuario - metodo put
+    */
+    async function salvarUsuario(id) {
+      const nome = document.getElementById(`nome-${id}`).value;
+      const email = document.getElementById(`email-${id}`).value;
+      const tipo = document.getElementById(`tipo-${id}`).value;
+
+      const resp = await fetch(`/usuario/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nome, email, tipo }),
+      });
+
+      if (resp.ok) {
+        const html = await resp.text();
+        document.getElementById(`usuario-${id}`).outerHTML = html;
+      } else {
+        alert("Erro ao salvar o usuario!")
+      }
+    }
+    
+    /*
+    Cancela a edição 
+    */
+    async function cancelarEdicao(id) {
+      // CORREÇÃO 2: Fetch único e .text()
+      const resp = await fetch(`/usuario/${id}`);
+      if (resp.ok) {
+        const html = await resp.text(); 
+        document.getElementById(`usuario-${id}`).outerHTML = html;
+      } else {
+        alert("Erro ao cancelar edição.");
+      }
+    }
+    
+    /*
+    Deleta o usuario
+    */
+    async function deletarUsuario(id) {
+      if (!confirm("Tem certeza que deseja excluir?")) return;
+
+      const resp = await fetch(`/usuario/${id}`, { method: "DELETE" });
+      if (resp.ok) {
+        document.getElementById(`usuario-${id}`).remove();
+      } else {
+        alert("Erro ao excluir usuario");
+      }
+    }
+  </script>
 </head>
 <body>
   <h1>Lista de Usuários</h1>
@@ -21,7 +101,16 @@
     </thead>
     <tbody>
       {% for usuario in usuarios %}
-        {% include "_usuario_row.html" %}
+        <tr id="usuario-{{ usuario.id }}">
+          <th>{{ usuario.id }}</th>
+          <td class="coluna-nome">{{ usuario.nome }}</td>
+          <td class="coluna-email">{{ usuario.email }}</td>
+          <td class="coluna-tipo">{{ usuario.tipo }}</td>
+          <td>
+            <button onclick="editarUsuario({{ usuario.id }})">Editar</button>
+            <button onclick="deletarUsuario({{ usuario.id }})">Deletar</button>
+          </td>      
+        </tr>
       {% endfor %}
     </tbody>
   </table>
