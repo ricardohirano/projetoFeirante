@@ -6,6 +6,8 @@ USUARIOS = [
         "tipo": "suporte",
         "cpf_cnpj": "11111111111",
         "telefone": "999999999",
+        "nome_fantasia": "Banca do Ricardo",
+        "bio": "Vendo produtos licitos e ilicitos.",
         "senha": "scrypt:32768:8:1$DYwVZ6ceEeUXYsGi$9f2a3d49d20e71217107fcbc093e6822d8c76bc3cf7aa9e510392cc054a157e8adb867f8c08b3b6729c590853932fcea27879f0a170cb24963d89f49d0077843"
     },
     {
@@ -15,6 +17,8 @@ USUARIOS = [
         "tipo": "suporte",
         "cpf_cnpj": "22222222222",
         "telefone": "999999999",
+        "nome_fantasia": "Banca do Ricardo",
+        "bio": "Vendo sapos giratorios.",
         "senha": "scrypt:32768:8:1$DYwVZ6ceEeUXYsGi$9f2a3d49d20e71217107fcbc093e6822d8c76bc3cf7aa9e510392cc054a157e8adb867f8c08b3b6729c590853932fcea27879f0a170cb24963d89f49d0077843"
     },
     {
@@ -24,6 +28,8 @@ USUARIOS = [
         "tipo": "suporte",
         "cpf_cnpj": "33333333333",
         "telefone": "999999999",
+        "nome_fantasia": "Banca do Ricardo",
+        "bio": "Vendo gatos.",
         "senha": "scrypt:32768:8:1$DYwVZ6ceEeUXYsGi$9f2a3d49d20e71217107fcbc093e6822d8c76bc3cf7aa9e510392cc054a157e8adb867f8c08b3b6729c590853932fcea27879f0a170cb24963d89f49d0077843"
     },
     {
@@ -33,6 +39,8 @@ USUARIOS = [
         "tipo": "suporte",
         "cpf_cnpj": "44444444444",
         "telefone": "999999999",
+        "nome_fantasia": "Banca do Hildo",
+        "bio": "Vendo MC Donalds ",
         "senha": "scrypt:32768:8:1$DYwVZ6ceEeUXYsGi$9f2a3d49d20e71217107fcbc093e6822d8c76bc3cf7aa9e510392cc054a157e8adb867f8c08b3b6729c590853932fcea27879f0a170cb24963d89f49d0077843"
     },
 ]

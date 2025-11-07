@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dados do Usuário</title>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <script>
+                window.onload = function() {
+                    {% for message in messages %}
+                        alert("{{ message }}"); 
+                    {% endfor %}
+                };
+            </script>
+        {% endif %}
+    {% endwith %}
+
+</head>
+<body>
+    <div>
+    <nav>
+            <button type="button" onclick="window.location.href='{{ url_for('home.logout') }}'">
+                ← Sair
+            </button>
+            
+            <hr>
+            <div>
+                {% for link in menu %}
+                    <button 
+                      type="button" 
+                      onclick="window.location.href='{{ link.url }}'"
+                      {{ 'disabled' if link.ativo else '' }}
+                    >
+                        {{ link.titulo }}
+                    </button>
+                    <br> 
+                {% endfor %}
+            </div>
+        </nav>
+        <hr>
+        <main>
+            <h1>Dados do Usuários</h1>
+             <form action="{{ url_for('home.dados_usuarios') }}" method="POST">
+                <div>
+                   <label>Nome Usuário:</label>
+                   <input type="text" name="nome" value="{{ usuario.get('nome', '') }}">
+                </div>
+                <div>
+                    <label>Telefone Usuário:</label>
+                    <input type="text" name="telefone" value="{{ usuario.get('telefone', '') }}">
+                </div>
+                <div>
+                    <label>Nome Fantasia:</label>
+                    <input type="text" name="nome_fantasia" value="{{ usuario.get('nome_fantasia', '') }}">
+                </div>
+                <div>
+                    <label>Bio:</label>
+                    <textarea name="bio">{{ usuario.get('bio', '') }}</textarea>
+                </div>
+                <br>
+                <button type="submit">ALTERAR </button>
+            </form>
+            <hr>
+            <button type="button" onclick="window.location.href='{{ url_for('home.mudar_senha') }}'">
+                MUDAR SENHA
+            </button>
+
+        </main>
+    </div>
+</body>
+</html>

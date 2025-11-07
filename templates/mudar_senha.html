@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova Senha</title>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <script>
+                window.onload = function() {
+                    {% for message in messages %}
+                        alert("{{ message|e }}"); 
+                    {% endfor %}
+                };
+            </script>
+        {% endif %}
+    {% endwith %}
+
+</head>
+<body>
+    <h1>Nova Senha</h1>
+
+    <form action="{{ url_for('home.mudar_senha') }}" method="POST">
+        <div>
+            <label for="senha_antiga"><b>Senha antiga:</b></label>
+            <input type="password" name="senha_antiga" required>
+        </div>
+        <br>
+        <div>
+            <label for="senha_nova"><b>Senha nova:</b></label>
+            <input type="password" name="senha_nova" required>
+        </div>
+        <br>
+        <div>
+            <label for="confirme_senha_nova"><b>Confirmar senha nova:</b></label>
+            <input type="password" name="confirme_senha_nova" required>
+        </div>
+        <br>
+        
+        <button type="submit">MUDAR SENHA</button>
+
+        <a href="{{ url_for('home.dados_usuarios') }}">
+            <button type="button">Cancelar</button>
+        </a>
+    </form>
+</body>
+</html>

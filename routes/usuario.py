@@ -8,6 +8,7 @@ from database.usuario import USUARIOS
 
 usuario_route = Blueprint("usuario", __name__)
 
+#funçoes para ajudar as buscas
 def buscar_usuario_por_id(usuario_id: int):
     return next((u for u in USUARIOS if u["id"] == usuario_id), None)
 
@@ -17,6 +18,7 @@ def buscar_usuario_por_email(email: str):
             return u
     return None
 
+#rota Suporte
 @usuario_route.route("/")
 def listar_usuarios():
     return render_template("listaUsuarios.html", usuarios=USUARIOS)
@@ -52,7 +54,7 @@ def excluir_usuario(usuario_id):
     USUARIOS.remove(usuario)
     return "", 204
 
-
+# Rota Feirante
 @usuario_route.route(
     "/cadastro", 
     methods=["GET", "POST"], 
@@ -93,6 +95,8 @@ def cadastrar_usuario():
             "cpf_cnpj": cpf,
             "telefone": telefone,
             "tipo" : "feirante",
+            "nome_fantasia": "", 
+            "bio": "",
             "senha" : hash_da_senha
         }
 
@@ -102,3 +106,4 @@ def cadastrar_usuario():
         return redirect(url_for("home.login_feirante"))
         
     return render_template("cadastroUsuario.html")
+

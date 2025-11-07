@@ -8,6 +8,7 @@ from routes.usuario import buscar_usuario_por_id, buscar_usuario_por_email
 
 home_route = Blueprint('home', __name__)
 
+#rota login
 @home_route.route('/', methods=["GET","POST"])
 def login_feirante():
     if request.method == "POST":
@@ -96,12 +97,12 @@ def painel_usuario():
         "dias_premium": 0
     }
 
-    # Links do Menu Lateral
+    # Links do Menu Lateral para nao repitir nos templates
     links_sidenav = [
         {"url": url_for('home.painel_usuario'), "titulo": "Inicial", "ativo": True},
         {"url": "#", "titulo": "Feiras", "ativo": False},
         {"url": "#", "titulo": "Produtos", "ativo": False},
-        {"url": "#", "titulo": "Dados Usuarios", "ativo": False}
+        {"url": url_for('home.dados_usuarios'), "titulo": "Dados Usuarios", "ativo": False}
     ]
 
     return render_template(
@@ -115,5 +116,82 @@ def painel_usuario():
 @home_route.route("/logout")
 def logout():
     session.pop('usuario_id', None)
+    session.pop('email_para_redefinir', None)
     flash("Você saiu com sucesso.", "success")
     return redirect(url_for("home.login_feirante"))
+
+
+#Rota Dados do Usuario
+
+@home_route.route("/dados-usuario", methods=["GET","POST"])
+def dados_usuarios():
+    if 'usuario_id' not in session:
+        flash("Você precisa estar logado para ver essa página.", "error")
+        return redirect(url_for("home.login_feirante"))
+    id_logado = session['usuario_id']
+    usuario_real = buscar_usuario_por_id(id_logado)
+
+    if not usuario_real:
+        session.pop('usuario_id', None)
+        flash("Usuario não encontrado. Faça login novamente.", "error")
+        return redirect(url_for("home.login_feirante"))
+    if request.method == "POST":
+        nome = request.form.get("nome")
+        telefone = request.form.get("telefone")
+        nome_fantasia = request.form.get("nome_fantasia")
+        bio = request.form.get("bio")
+        # atualiza no banco USUARIO
+
+        usuario_real['nome'] = nome
+        usuario_real['telefone'] = telefone
+        usuario_real['nome_fantasia'] = nome_fantasia
+        usuario_real['bio'] = bio
+
+        flash("Dados atualizados com sucesso!", "success")
+        return redirect(url_for('home.dados_usuarios'))
+    links_sidenav = [
+        {"url": url_for('home.painel_usuario'), "titulo": "Inicial", "ativo": False},
+        {"url": "#", "titulo": "Feiras", "ativo": False},
+        {"url": "#", "titulo": "Produtos", "ativo": False},
+        {"url": url_for('home.dados_usuarios'), "titulo": "Dados Usuarios", "ativo": True}
+    ]
+    return render_template(
+        "dados_usuarios.html",
+        usuario = usuario_real,
+        menu = links_sidenav
+    )
+
+#Rota mudar senha no "dados do usuarios"
+
+@home_route.route('/mudar-senha', methods=["GET", "POST"])
+def mudar_senha():
+    if 'usuario_id' not in session:
+        flash("Voce precisa estar logado para ver essa página.", "error")
+        return redirect(url_for("home.login_feirante"))
+    id_logado = session['usuario_id']
+    usuario_real = buscar_usuario_por_id(id_logado)
+
+    if not usuario_real:
+        session.pop('usuario_id', None)
+        return redirect(url_for("home.login_feirante"))
+    
+    if request.method == "POST":
+        senha_antiga = request.form.get("senha_antiga")
+        senha_nova = request.form.get("senha_nova")
+        confirme_senha_nova = request.form.get("confirme_senha_nova")
+            
+        if not check_password_hash(usuario_real.get("senha"), senha_antiga):
+            flash("A sua 'Senha antiga' está incorreta.", "error")
+            return render_template("mudar_senha.html")
+        
+        if senha_nova != confirme_senha_nova:
+            flash("A 'Senha Antiga' está incorreta.", "error")
+            return render_template("mudar_senha.html")
+        
+        hash_da_senha_nova = generate_password_hash(senha_nova)
+        usuario_real['senha'] = hash_da_senha_nova
+
+        flash("Senha alterada com sucesso!", "success")
+        return redirect(url_for("home.dados_usuarios"))
+    return render_template("mudar_senha.html")
+
