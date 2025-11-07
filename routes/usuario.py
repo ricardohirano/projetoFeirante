@@ -1,4 +1,7 @@
-from flask import (Blueprint, render_template, request, abort, flash, session, redirect, url_for)
+from flask import (
+    Blueprint, render_template, request, 
+    abort, flash, session, redirect, url_for
+)
 from werkzeug.security import generate_password_hash
 from database.usuario import USUARIOS
 
@@ -25,13 +28,16 @@ def editar_usuario(usuario_id):
         abort(404)
     return render_template("_usuario_row.html", usuario=usuario)
 
+
 @usuario_route.put("/<int:usuario_id>")
 def atualizar_usuario(usuario_id):
     usuario = buscar_usuario_por_id(usuario_id)
     if not usuario:
         abort(404)
 
-    data = request.get_json(force=True)
+
+    data = request.form
+    
     usuario["nome"] = data.get("nome", usuario["nome"])
     usuario["email"] = data.get("email", usuario["email"])
     usuario["tipo"] = data.get("tipo", usuario["tipo"])
@@ -39,19 +45,19 @@ def atualizar_usuario(usuario_id):
 
 @usuario_route.delete("/<int:usuario_id>")
 def excluir_usuario(usuario_id):
+
     usuario = buscar_usuario_por_id(usuario_id)
     if not usuario:
         abort(404)
     USUARIOS.remove(usuario)
     return "", 204
 
-# GET /usuario/cadastro → mostra o formulário de cadastro
+
 @usuario_route.route(
     "/cadastro", 
     methods=["GET", "POST"], 
     endpoint="cadastrar_usuario"
 )
-#cadastro vindo do formulario
 def cadastrar_usuario():
     
     if request.method == "POST":
@@ -66,32 +72,33 @@ def cadastrar_usuario():
         if email != confirme_email:
             flash("os emails não conferem!", "error")
             return render_template("cadastroUsuario.html")
+            
         if senha != confirme_senha:
             flash("As senhas não conferem!", "error")
             return render_template("cadastroUsuario.html")
         
         if buscar_usuario_por_email(email):
-            flash("Este email já está cadastrado. Tente outro.", "erro")
+            flash("Este email já está cadastrado. Tente outro.", "error")
             return render_template("cadastroUsuario.html") 
         
         hash_da_senha = generate_password_hash(senha)
-        #novo_id e novo_usuario com tipo:feirante como default 
-
+        
         ultimo_id = USUARIOS[-1]["id"] if USUARIOS else 0
-        novo_id = ultimo_id +1
+        novo_id = ultimo_id + 1
 
         novo_usuario = {
             "id" : novo_id,
             "nome" : nome,
-            "email" : email, 
-            "cpf_cnpj": cpf, 
-            "telefone": telefone, 
+            "email" : email,
+            "cpf_cnpj": cpf,
+            "telefone": telefone,
             "tipo" : "feirante",
             "senha" : hash_da_senha
         }
 
         USUARIOS.append(novo_usuario)
 
-        flash("Cadastro realizado com sucesso! Faça seu login.", "successo")
+        flash("Cadastro realizado com sucesso! Faça seu login.", "success")
         return redirect(url_for("home.login_feirante"))
+        
     return render_template("cadastroUsuario.html")

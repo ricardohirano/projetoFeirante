@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova Senha</title>
+</head>
+<body>
+    <h1>Nova Senha</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form 
+        action="{{ url_for('home.redefinir_senha') }}" 
+        method="POST"
+    >
+        <div>
+            <label for="senha"><b>Senha nova:</b></label>
+            <input 
+                type="password" 
+                name="senha" 
+                required
+            >
+        </div>
+        <br>
+        <div>
+            <label for="confirme_senha"><b>Confirmar senha nova:</b></label>
+            <input 
+                type="password" 
+                name="confirme_senha" 
+                required
+            >
+        </div>
+        <br>
+        <button type="submit">CONFIRMAR SENHA</button>
+    </form>
+</body>
+</html>

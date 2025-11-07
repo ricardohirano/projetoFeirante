@@ -3,44 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Esqueci a Senha</title>
+    <title>Login</title> 
 </head>
 <body>
-    <h1>Esqueci minha senha</h1>
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="flash-{{ category }}">{{ message }}</div>
-            {% endfor %}
+    <h1>TELA DE LOGIN</h1> 
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <script>
+            // Executa assim que a página terminar de carregar
+            window.onload = function() {
+                // Faz um loop por cada mensagem enviada pelo Flask
+                {% for message in messages %}
+                    // Chama o alert() para cada mensagem
+                    // O |e é um filtro de segurança
+                    alert("{{ message|e }}"); 
+                {% endfor %}
+            };
+        </script>
         {% endif %}
     {% endwith %}
-
-    <form action="{{ url_for('home.esqueci_senha') }}" method="POST">
+    <form 
+        action="{{ url_for('home.login_feirante') }}" 
+        method="POST"
+    >
         <div>
-            <label for="email"><b>EMAIL:</b></label>
+            <label for="email"><b>Email:</b></label>
             <input 
                 type="email" 
+                placeholder="Digite seu email" 
                 name="email" 
                 required
             >
         </div>
         <br>
         <div>
-            <label for="cpf_cnpj"><b>CPF/CNPJ:</b></label>
+            <label for="senha"><b>Senha:</b></label>
             <input 
-                type="text" 
-                name="cpf_cnpj" 
+                type="password" 
+                placeholder="Digite sua senha" 
+                name="senha" 
                 required
             >
         </div>
         <br>
-        
-        <button type="submit">CONFIRMAR</button>
-        
-        <a href="{{ url_for('home.login_feirante') }}">
-            <button type="button">CANCELAR</button>
-        </a>
+        <button type="submit">Login</button>
     </form>
+    
+    <br>
+    <hr>
+    <div>
+        <span>
+            <a href="{{ url_for('usuario.cadastrar_usuario') }}">
+              Cadastre-se
+            </a>
+        </span>
+        <br>
+        <span class="senha">
+            Esqueceu a 
+            <a href="{{ url_for('home.esqueci_senha') }}">Senha?</a>
+        </span>
+    </div>
 </body>
 </html>
