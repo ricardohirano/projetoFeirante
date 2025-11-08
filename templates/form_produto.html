@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <script>
+                window.onload = function() {
+                    {% for message in messages %}
+                        alert("{{ message|e }}"); 
+                    {% endfor %}
+                };
+            </script>
+        {% endif %}
+    {% endwith %}
+</head>
+<body>
+    <a href="{{ url_for('produto.lista_produtos') }}"><button type="button">← Voltar</button></a>
+    
+    <h1>{{ page_title }}</h1>
+
+    <form action="{{ url_for('produto.processar_form_produto', produto_id=produto.id) if produto.id else url_for('produto.processar_form_produto') }}" method="POST" >
+     
+        <div>
+            <label>Nome do Produto:</label>
+            <input type="text" name="nome" value="{{ produto.get('nome', '') }}" required>
+        </div>
+        <br>
+        <div>
+            <label>Categoria:</label>
+            <select name="categoria" required>
+                <option value="">Selecione...</option>
+                {% for cat in categorias %}
+                    <option value="{{ cat }}" {{ 'selected' if produto.get('categoria') == cat else '' }}> {{ cat|capitalize }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <br>
+        <div>
+            <label>Preço:</label>
+            <input type="text" name="preco" value="{{ produto.get('preco', '') }}" required>
+        </div>
+        <br>
+        <div>
+            <label>Unidade:</label>
+            <select name="unidade" required>
+                <option value="">Selecione...</option>
+                {% for un in unidades %}
+                    <option value="{{ un }}" {{ 'selected' if produto.get('unidade') == un else '' }}> {{ un }} </option>
+                {% endfor %}
+            </select>
+        </div>
+        <br>
+        <div>
+            <label>Descrição:</label>
+            <textarea name="descricao">{{ produto.get('descricao', '') }}</textarea>
+        </div>
+        <br>
+        <div>
+            <label>URL da Imagem:</label>
+            <input type="text" name="imagem_url" value="{{ produto.get('imagem_url', '') }}" placeholder="https://...(cole um link de imagem)"
+            >
+        </div>
+        <br>
+
+        <button type="submit">Confirmar</button>
+    </form>
+    {% if produto.id %}
+        <hr>
+        <form action="{{ url_for('produto.deletar_produto', produto_id=produto.id) }}" method="POST">
+            <button type="submit" onclick="return confirm('Tem certeza que deseja deletar {{ produto.nome }}?');"> Deletar Produto</button>
+        </form>
+    {% endif %}
+
+</body>
+</html>

@@ -8,7 +8,7 @@ from database.usuario import USUARIOS
 
 usuario_route = Blueprint("usuario", __name__)
 
-#funçoes para ajudar as buscas
+#Funções de busca 
 def buscar_usuario_por_id(usuario_id: int):
     return next((u for u in USUARIOS if u["id"] == usuario_id), None)
 
@@ -18,43 +18,43 @@ def buscar_usuario_por_email(email: str):
             return u
     return None
 
-#rota Suporte
+
+#Rota ADMIN
 @usuario_route.route("/")
 def listar_usuarios():
+    
     return render_template("listaUsuarios.html", usuarios=USUARIOS)
 
 @usuario_route.get("/<int:usuario_id>")
-def editar_usuario(usuario_id):
+def get_usuario_linha(usuario_id):
     usuario = buscar_usuario_por_id(usuario_id)
     if not usuario:
         abort(404)
-    return render_template("_usuario_row.html", usuario=usuario)
 
+    return render_template("_usuario_row.html", usuario=usuario)
 
 @usuario_route.put("/<int:usuario_id>")
 def atualizar_usuario(usuario_id):
     usuario = buscar_usuario_por_id(usuario_id)
     if not usuario:
         abort(404)
-
-
-    data = request.form
+    data = request.get_json() 
     
     usuario["nome"] = data.get("nome", usuario["nome"])
     usuario["email"] = data.get("email", usuario["email"])
     usuario["tipo"] = data.get("tipo", usuario["tipo"])
+    
     return render_template("_usuario_row.html", usuario=usuario)
 
 @usuario_route.delete("/<int:usuario_id>")
 def excluir_usuario(usuario_id):
-
     usuario = buscar_usuario_por_id(usuario_id)
     if not usuario:
         abort(404)
     USUARIOS.remove(usuario)
-    return "", 204
+    return "", 204 
 
-# Rota Feirante
+#Rota Feirante
 @usuario_route.route(
     "/cadastro", 
     methods=["GET", "POST"], 
@@ -71,14 +71,13 @@ def cadastrar_usuario():
         cpf = request.form.get("cpf")
         telefone = request.form.get("telefone")
 
+        
         if email != confirme_email:
             flash("os emails não conferem!", "error")
             return render_template("cadastroUsuario.html")
-            
         if senha != confirme_senha:
             flash("As senhas não conferem!", "error")
             return render_template("cadastroUsuario.html")
-        
         if buscar_usuario_por_email(email):
             flash("Este email já está cadastrado. Tente outro.", "error")
             return render_template("cadastroUsuario.html") 
@@ -91,13 +90,13 @@ def cadastrar_usuario():
         novo_usuario = {
             "id" : novo_id,
             "nome" : nome,
-            "email" : email,
-            "cpf_cnpj": cpf,
-            "telefone": telefone,
+            "email" : email, 
+            "cpf_cnpj": cpf, 
+            "telefone": telefone, 
             "tipo" : "feirante",
-            "nome_fantasia": "", 
-            "bio": "",
-            "senha" : hash_da_senha
+            "senha" : hash_da_senha,
+            "nome_fantasia": "",
+            "bio": ""
         }
 
         USUARIOS.append(novo_usuario)
@@ -106,4 +105,3 @@ def cadastrar_usuario():
         return redirect(url_for("home.login_feirante"))
         
     return render_template("cadastroUsuario.html")
-

@@ -1,0 +1,136 @@
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, abort
+from database.produto import PRODUTOS, CATEGORIAS, UNIDADES
+from routes.usuario import buscar_usuario_por_id
+
+produto_route = Blueprint('produto', __name__, url_prefix='/produto')
+@produto_route.route('/')
+def lista_produtos():
+    if 'usuario_id' not in session:
+        flash("Voce precisa estar logado.", "error")
+        return redirect(url_for("home.login_feirante"))
+    
+    id_logado = session['usuario_id']
+
+    produtos_do_usuario = []
+    for p in PRODUTOS:
+        if p.get('usuario_id') == id_logado:
+            produtos_do_usuario.append(p)
+    
+    produtos_agrupados = {}
+    for cat in CATEGORIAS:
+        produtos_desta_categoria = []
+        for p in produtos_do_usuario:
+            if p.get('categoria') == cat:
+                produtos_desta_categoria.append(p)
+        
+        if produtos_desta_categoria:
+            produtos_agrupados[cat] = produtos_desta_categoria
+
+    links_sidenav = [
+        {"url": url_for('home.painel_usuario'), "titulo": "Inicial", "ativo": False},
+        {"url": "#", "titulo": "Feiras", "ativo": False},
+        {"url": url_for('produto.lista_produtos'), "titulo": "Produtos", "ativo": True},
+        {"url": url_for('home.dados_usuarios'), "titulo": "Dados Usuarios", "ativo": False}
+    ]
+    
+    return render_template(
+        "lista_produtos.html",
+        produtos_agrupados=produtos_agrupados, 
+        menu=links_sidenav
+    )
+
+# Rota Formulário (para Criar ou Editar) ---
+
+@produto_route.route('/form', defaults={'produto_id': None}, methods=["GET"])
+@produto_route.route('/form/<int:produto_id>', methods=["GET"])
+def form_produto(produto_id):
+    if 'usuario_id' not in session:
+        flash("Você precisa estar logado", "error")
+        return redirect(url_for("home.login_feirante"))
+    id_logado = session['usuario_id']
+
+    if produto_id:
+        produto = next((p for p in PRODUTOS if p['id'] == produto_id), None)
+        if not produto or produto['usuario_id'] != id_logado:
+            flash("Produto não encontrado.", "error")
+            return redirect(url_for('produto.lista_produtos'))
+        
+        page_title = "Editar Produto"
+    else:
+        produto = {}
+        page_title = "Cadastro de Produto" 
+        
+    return render_template(
+        "form_produto.html",
+        page_title=page_title,
+        produto=produto,
+        categorias=CATEGORIAS,
+        unidades=UNIDADES
+        )
+
+#Rota Processar o Formulário 
+@produto_route.route('/form', defaults={'produto_id': None}, methods=["POST"])
+@produto_route.route('/form/<int:produto_id>', methods=["POST"])
+def processar_form_produto(produto_id):
+    if 'usuario_id' not in session:
+        return redirect(url_for("home.login_feirante"))
+    
+    id_logado = session['usuario_id'] 
+
+    #COLETA DE DADOS DO FORM
+    nome = request.form.get("nome")
+    preco = request.form.get("preco")
+    categoria = request.form.get("categoria")
+    unidade = request.form.get("unidade")
+    descricao = request.form.get("descricao")
+    imagem_url = request.form.get("imagem_url")
+
+    if produto_id:
+        produto = next((p for p in PRODUTOS if p['id'] == produto_id), None)
+        if not produto or produto['usuario_id'] != id_logado:
+            abort(404) 
+        
+        produto['nome'] = nome
+        produto['preco'] = preco
+        produto['categoria'] = categoria
+        produto['unidade'] = unidade
+        produto['descricao'] = descricao
+        produto['imagem_url'] = imagem_url
+        
+        flash("Produto atualizado com sucesso!", "success")
+    else:
+        ultimo_id = PRODUTOS[-1]["id"] if PRODUTOS else 0
+        novo_id = ultimo_id + 1
+        
+        novo_produto = {
+            "id": novo_id,
+            "usuario_id": id_logado,
+            "nome": nome,
+            "preco": preco,
+            "unidade": unidade,
+            "categoria": categoria,
+            "descricao": descricao,
+            "imagem_url": imagem_url
+        }
+        PRODUTOS.append(novo_produto)
+        flash("Produto cadastrado com sucesso!", "success")
+
+    return redirect(url_for('produto.lista_produtos'))
+
+
+@produto_route.route('/delete/<int:produto_id>', methods=["POST"])
+def deletar_produto(produto_id):
+    if 'usuario_id' not in session:
+        return redirect(url_for("home.login_feirante"))
+    
+    id_logado = session['usuario_id']
+    
+    produto = next((p for p in PRODUTOS if p['id'] == produto_id), None)
+    
+    if not produto or produto['usuario_id'] != id_logado:
+        flash("Erro ao deletar produto.", "error")
+    else:
+        PRODUTOS.remove(produto)
+        flash("Produto deletado com sucesso.", "success")
+        
+    return redirect(url_for('produto.lista_produtos'))

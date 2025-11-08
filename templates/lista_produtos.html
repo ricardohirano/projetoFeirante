@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lista de Produtos</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <script>
+                window.onload = function() {
+                    {% for category, message in messages %}
+                        alert("{{ message|e }}"); 
+                    {% endfor %}
+                };
+            </script>
+        {% endif %}
+    {% endwith %}
+
+</head>
+<body>
+    <div>
+        <nav>
+            <button type="button" onclick="window.location.href='{{ url_for('home.logout') }}'" > ← Sair </button>
+            <hr>
+            <!-- Menu lateral com botões -->
+            <div>
+                {% for link in menu %}
+                    <button type="button" onclick="window.location.href='{{ link.url }}'" {{ 'disabled' if link.ativo else '' }}> {{ link.titulo }}</button>
+                    <br> 
+                {% endfor %}
+            </div>
+        </nav>
+        <hr>
+        <main>
+            <h1>LISTA PRODUTOS</h1>
+            <button type="button" onclick="window.location.href='{{ url_for('produto.form_produto') }}'">+ Produtos </button>
+            <hr>
+            {% for categoria, lista_de_produtos in produtos_agrupados.items() %}
+                <h2 style="text-transform: capitalize;">{{ categoria }}</h2>
+                <div class="container-produtos">
+                    {% for p in lista_de_produtos %}
+                        <div class="card-produto">
+                            <img src="{{ p.get('imagem_url', 'https://placehold.co/150x100/eeeeee/cccccc?text=Sem+Foto') }}" alt="{{ p.nome }}">
+                            <h4>{{ p.nome }}</h4>
+                            <p>R$ {{ p.preco }} - {{ p.unidade }}</p>
+                            <button type="button" onclick="window.location.href='{{ url_for('produto.form_produto', produto_id=p.id) }}'">Editar</button>
+                            <form action="{{ url_for('produto.deletar_produto', produto_id=p.id) }}" method="POST" style="display: inline;">
+                                <button type="submit" onclick="return confirm('Tem certeza que deseja deletar {{ p.nome }}?');"> Deletar </button>
+                            </form>
+                        </div>
+                    {% endfor %}
+                </div>
+                <hr>
+            {% else %}
+                <p>Você ainda não cadastrou nenhum produto.</p>
+            {% endfor %}
+        </main>
+    </div>
+</body>
+</html>

@@ -1,10 +1,9 @@
-from flask import (
-    Blueprint, render_template, request, 
-    redirect, url_for, flash, session
-)
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from database.usuario import USUARIOS
 from routes.usuario import buscar_usuario_por_id, buscar_usuario_por_email
+
+
 
 home_route = Blueprint('home', __name__)
 
@@ -97,11 +96,10 @@ def painel_usuario():
         "dias_premium": 0
     }
 
-    # Links do Menu Lateral para nao repitir nos templates
     links_sidenav = [
         {"url": url_for('home.painel_usuario'), "titulo": "Inicial", "ativo": True},
         {"url": "#", "titulo": "Feiras", "ativo": False},
-        {"url": "#", "titulo": "Produtos", "ativo": False},
+        {"url": url_for('produto.lista_produtos'), "titulo": "Produtos", "ativo": False},
         {"url": url_for('home.dados_usuarios'), "titulo": "Dados Usuarios", "ativo": False}
     ]
 
@@ -152,7 +150,7 @@ def dados_usuarios():
     links_sidenav = [
         {"url": url_for('home.painel_usuario'), "titulo": "Inicial", "ativo": False},
         {"url": "#", "titulo": "Feiras", "ativo": False},
-        {"url": "#", "titulo": "Produtos", "ativo": False},
+        {"url": url_for('produto.lista_produtos'), "titulo": "Produtos", "ativo": False},  
         {"url": url_for('home.dados_usuarios'), "titulo": "Dados Usuarios", "ativo": True}
     ]
     return render_template(
@@ -185,7 +183,7 @@ def mudar_senha():
             return render_template("mudar_senha.html")
         
         if senha_nova != confirme_senha_nova:
-            flash("A 'Senha Antiga' está incorreta.", "error")
+            flash("A 'Senha nova' e a 'Confirmação' não são iguais.", "error")
             return render_template("mudar_senha.html")
         
         hash_da_senha_nova = generate_password_hash(senha_nova)
