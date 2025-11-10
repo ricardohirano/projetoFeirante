@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agendar Feiras - Passo 1</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Usa o 'alert()' como preferiu -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <script>
+                window.onload = function() {
+                    {% for category, message in messages %}
+                       alert({{ message|tojson }}); 
+                    {% endfor %}
+                };
+            </script>
+        {% endif %}
+    {% endwith %}
+
+</head>
+<body>
+    <div>
+        <!-- Coluna 1: Barra Lateral (Sidenav) -->
+        <nav>
+            <button 
+              type="button" 
+              onclick="window.location.href='{{ url_for('home.logout') }}'"
+            >
+                ← Voltar Login (Sair)
+            </button>
+            
+            <hr>
+            
+            <!-- Menu lateral com botões -->
+            <div>
+                {% for link in menu %}
+                    <button 
+                      type="button" 
+                      onclick="window.location.href='{{ link.url }}'"
+                      {{ 'disabled' if link.ativo else '' }}
+                    >
+                        {{ link.titulo }}
+                    </button>
+                    <br> 
+                {% endfor %}
+            </div>
+        </nav>
+        
+        <hr>
+        
+        <!-- Coluna 2: Conteúdo Principal -->
+        <main>
+            <h1>Agendar Participação em Feira</h1>
+            
+            <form action="{{ url_for('feira.selecionar_feira') }}" method="POST">
+                <div>
+                    <label>Cidade:</label>
+                    <select name="cidade" required>
+                        {% for c in cidades %}
+                          <option value="{{ c }}">{{ c }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <br>
+                <div>
+                    <label>Selecione a Feira:</label>
+                    <select name="feira_id" required onchange="mostrarDetalhesFeira(this);">
+                        <option value="">Selecione...</option>
+                        
+                        <!-- 
+                          Passa 'mapa_embed_url' para o data-mapa
+                        -->
+                        {% for feira in feiras_disponiveis %}
+                          <option 
+                            value="{{ feira.id }}"
+                            data-horario="{{ feira.horario }}"
+                            data-endereco="{{ feira.endereco }}"
+                            data-mapa="{{ feira.mapa_embed_url }}"
+                          >
+                              {{ feira.nome }}
+                          </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <br>
+
+                <!-- 
+                  Este 'div' vai mostrar os 
+                  detalhes da feira, incluindo o iframe do mapa.
+                -->
+                <div id="detalhes-feira" style="border: 1px solid #ddd; padding: 10px; margin-bottom: 20px; display: none;">
+                    <!-- O JavaScript vai preencher isto -->
+                </div>
+
+                <div>
+                    <label>Data que você irá participar:</label>
+                    <!-- 
+                      CORREÇÃO: Usa 'min_date' vindo do Python
+                    -->
+                    <input 
+                      type="date" 
+                      name="data" 
+                      required
+                      min="{{ min_date }}"
+                    >
+                </div>
+                <br>
+                <button type="submit">Selecionar Produtos (Próximo)</button>
+            </form>
+
+        </main>
+    </div>
+
+    <!-- 
+      O script JavaScript que cria o iframe.
+    -->
+    <script>
+        function mostrarDetalhesFeira(selectElement) {
+            const detalhesDiv = document.getElementById('detalhes-feira');
+            
+            const selectedOption = selectElement.options[selectElement.selectedIndex];
+            
+            if (!selectedOption.value) {
+                detalhesDiv.style.display = 'none';
+                return;
+            }
+
+            const horario = selectedOption.getAttribute('data-horario');
+            const endereco = selectedOption.getAttribute('data-endereco');
+            const mapaEmbedUrl = selectedOption.getAttribute('data-mapa');
+
+            // Insere o HTML dentro da 'div'
+            detalhesDiv.innerHTML = `
+                <h4>Detalhes da Feira</h4>
+                <p><strong>Horário:</strong> ${horario}</p>
+                <p><strong>Endereço:</strong> ${endereco}</p>
+                <iframe 
+                  src="${mapaEmbedUrl}" 
+                  width="100%" 
+                  height="300" 
+                  style="border:0;" 
+                  allowfullscreen="" 
+                  loading="lazy" 
+                  referrerpolicy="no-referrer-when-downgrade"
+                ></iframe>
+            `;
+            
+            // Mostra a 'div'
+            detalhesDiv.style.display = 'block';
+        }
+    </script>
+
+</body>
+</html>

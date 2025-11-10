@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agendar Feiras - Passo 2</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div>
+        <main>
+            <!-- Botão Voltar -->
+            <a href="{{ url_for('feira.selecionar_feira') }}">
+                <button type="button">Voltar</button>
+            </a>
+            
+            <h1>Confirmar Agendamento e Produtos</h1>
+            
+            <!-- 1. Detalhes da Feira e Data -->
+            <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
+                <h3>Sua Seleção:</h3>
+                <p><b>Feira:</b> {{ feira.nome }}</p>
+                <p><b>Endereço:</b> {{ feira.endereco }}</p>
+                <!-- Usa a variável 'data_formatada' (DD/MM/YYYY) -->
+                <p><b>Data:</b> {{ data_formatada }}</p>
+            </div>
+
+            <hr>
+
+            <!-- 
+              *** A CORREÇÃO ESTÁ AQUI ***
+              O 'action' do formulário agora aponta para 
+              a rota 'feira.preview_agendamento' (Página 3)
+            -->
+            <form action="{{ url_for('feira.preview_agendamento') }}" method="POST">
+                
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3>Selecione os produtos que você irá levar:</h3>
+                    <!-- Botão "+ Produtos" (abre noutro separador) -->
+                    <a href="{{ url_for('produto.form_produto') }}" target="_blank">
+                        <button type="button">+ Produtos</button>
+                    </a>
+                </div>
+                <p style="font-size: 0.9em; color: #555;">
+                  (Se cadastrar um novo produto, por favor recarregue esta página
+                  antes de confirmar o agendamento.)
+                </p>
+                
+                <!-- Loop por Categoria -->
+                {% for categoria, lista_de_produtos in produtos_agrupados.items() %}
+            
+                    <h2 style="text-transform: capitalize;">{{ categoria }}</h2>
+                    
+                    <div class="container-produtos">
+                        
+                        <!-- Loop por Produto -->
+                        {% for p in lista_de_produtos %}
+                            <div class="card-produto">
+                                <img 
+                                  src="{{ p.get('imagem_url', 'https://placehold.co/150x100/eeeeee/cccccc?text=Sem+Foto') }}" 
+                                  alt="{{ p.nome }}"
+                                >
+                                <h4>{{ p.nome }}</h4>
+                                <p>{{ p.unidade }} R$ {{ p.preco }}</p>
+                                
+                                <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; display: flex; align-items: center; justify-content: center;">
+                                    <label 
+                                      for="prod-{{ p.id }}" 
+                                      style="margin-right: 8px; font-weight: bold; cursor: pointer;"
+                                    >
+                                        Adicionar
+                                    </label>
+                                    <input 
+                                      type="checkbox" 
+                                      name="produto_ids" 
+                                      value="{{ p.id }}"
+                                      id="prod-{{ p.id }}"
+                                      style="width: 18px; height: 18px; cursor: pointer;"
+                                    >
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <hr> 
+
+                {% else %}
+                    <p>
+                      Você não tem nenhum produto cadastrado. 
+                      <a href="{{ url_for('produto.form_produto') }}">
+                        Cadastre um produto primeiro.
+                      </a>
+                    </p>
+                {% endfor %}
+
+                
+
+                <!-- 
+                  Botão "Submit" que envia para a 
+                  página de Preview
+                -->
+                <button type="submit">
+                    Pré-visualizar Vitrine
+                </button>
+
+                <a href="{{ url_for('feira.selecionar_feira') }}">
+                    <button type="button">Cancelar (Voltar)</button>
+                </a>
+            </form>
+
+        </main>
+    </div>
+</body>
+</html>

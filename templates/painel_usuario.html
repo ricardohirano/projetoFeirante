@@ -4,48 +4,103 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Painel do Usuário</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <!-- Usa o 'alert()' como preferiu -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <script>
+                window.onload = function() {
+                    {% for category, message in messages %}
+                        alert("{{ message|e }}"); 
+                    {% endfor %}
+                };
+            </script>
+        {% endif %}
+    {% endwith %}
+    
 </head>
 <body>
     <div>
-      <nav>
-        <button type="button" onclick="window.location.href='{{ url_for('home.logout') }}'">
-                ← Sair
+        <!-- Coluna 1: Barra Lateral (Sidenav) -->
+        <nav>
+            <button 
+              type="button" 
+              onclick="window.location.href='{{ url_for('home.logout') }}'"
+            >
+                ← Voltar Login (Sair)
             </button>
+            
             <hr>
+            
+            <!-- Menu lateral com botões -->
             <div>
-              {% for link in menu %}
-                <button type="button" onclick="window.location.href='{{ link.url }}'" {{ 'disabled' if link.ativo else '' }}>
-                  {{ link.titulo }}
+                {% for link in menu %}
+                    <button 
+                      type="button" 
+                      onclick="window.location.href='{{ link.url }}'"
+                      {{ 'disabled' if link.ativo else '' }}
+                    >
+                        {{ link.titulo }}
+                    </button>
+                    <br> 
+                {% endfor %}
+            </div>
+        </nav>
+        
+        <hr>
+        
+        <!-- Coluna 2: Conteúdo Principal -->
+        <main>
+            <h1>Bem vindo {{ usuario.nome }}</h1>
+            
+            <!-- Estatísticas -->
+            <div>
+                <div>
+                  Numero de Visualizações: {{ stats.visualizacoes }}
+                </div>
+                <div>
+                  Numeros de Gostei: {{ stats.gostei }}
+                </div>
+                <div>
+                  Numero de Favoritos: {{ stats.favoritos }}
+                </div>
+                <div>
+                  Dias Premium: {{ stats.dias_premium }}
+                </div>
+            </div>
+
+            <hr>
+            
+            <!-- 
+              *** ATALHO ADICIONADO (COMO VOCÊ PEDIU) ***
+            -->
+            <button 
+              type="button"
+              onclick="window.location.href='{{ url_for('feira.minhas_feiras') }}'"
+            >
+                Meus Agendamentos (Aguardando Aprovação)
+            </button>
+            
+            <hr>
+            
+            <!-- Botões de Ação (Premium) -->
+            <div>
+                <button 
+                  type="button"
+                  disabled 
+                  title="Função a ser implementada"
+                >
+                    Solicitar Premium
                 </button>
-                <br>
-              {% endfor %}
+                <button 
+                  type="button"
+                  disabled 
+                  title="Função a ser implementada"
+                >
+                    Pagar Premium
+                </button>
             </div>
-      </nav>
-      <hr>
-      <main>
-        <h1>Bem vindo {{ usuario.nome }}</h1>
-          <div>
-            <div>
-              Numero de Visualizações: {{ stats.visualizacoes }}
-            </div>
-            <div>
-              Numeros de Gostei: {{ stats.gostei }}
-            </div>
-            <div>
-              Numero de Favoritos: {{ stats.favoritos }}
-            </div>
-            <div>
-              Dias Premium: {{ stats.dias_premium }}
-            </div>
-          </div>
-          <div>
-            <button type="button" disabled title="Função a ser implementada"></button>
-              Solicitar Premium
-            </button>
-            <button type="button" disabled title="Função a ser implementada">
-              Pagar Premium
-            </button>
-          </div>
         </main>
     </div>
 </body>

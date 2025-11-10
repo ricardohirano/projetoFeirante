@@ -54,3 +54,18 @@ PRODUTOS = [
 
 CATEGORIAS = ["frutas", "verduras", "legumes", "peixes", "outros"]
 UNIDADES = ["un", "kg", "maco", "penca", "duzia", "bandeja", "pacote", "litro"]
+
+def buscar_produtos_por_ids(lista_de_ids: list):
+    """
+    Recebe uma lista de IDs (ex: [1, 3, 5]) e retorna
+    a lista completa dos dicionários desses produtos.
+    """
+    produtos_encontrados = []
+    # Faz um loop pela lista de IDs que o usuário selecionou
+    for produto_id in lista_de_ids:
+        # Procura o produto na base de dados
+        produto = next((p for p in PRODUTOS if p["id"] == produto_id), None)
+        # Se o produto for encontrado, adiciona à lista
+        if produto:
+            produtos_encontrados.append(produto)
+    return produtos_encontrados
