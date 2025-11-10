@@ -6,7 +6,7 @@
     <title>Agendar Feiras - Passo 1</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-    <!-- Usa o 'alert()' como preferiu -->
+    
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <script>
@@ -22,14 +22,9 @@
 </head>
 <body>
     <div>
-        <!-- Coluna 1: Barra Lateral (Sidenav) -->
+        
         <nav>
-            <button 
-              type="button" 
-              onclick="window.location.href='{{ url_for('home.logout') }}'"
-            >
-                ← Voltar Login (Sair)
-            </button>
+            <button type="button" onclick="window.location.href='{{ url_for('home.logout') }}'">← Voltar</button>
             
             <hr>
             

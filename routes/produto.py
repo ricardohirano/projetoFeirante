@@ -1,14 +1,11 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, abort
-# IMPORTANTE: Importe CATEGORIAS e UNIDADES
 from database.produto import PRODUTOS, CATEGORIAS, UNIDADES
-# --- 1. NOVA IMPORTAÇÃO ---
-# Precisamos de aceder à agenda de feiras para verificar se o produto está a ser usado
 from database.feira import FEIRANTE_AGENDA 
 from routes.usuario import buscar_usuario_por_id
 
 produto_route = Blueprint('produto', __name__, url_prefix='/produto')
 
-# --- ROTA DA LISTA DE PRODUTOS ---
+#Rota produtos
 @produto_route.route('/')
 def lista_produtos():
     if 'usuario_id' not in session:
@@ -17,7 +14,6 @@ def lista_produtos():
     
     id_logado = session['usuario_id']
 
-    # (A lógica de agrupamento está correta)
     produtos_do_usuario = []
     for p in PRODUTOS:
         if p.get('usuario_id') == id_logado:
@@ -33,8 +29,6 @@ def lista_produtos():
         if produtos_desta_categoria:
             produtos_agrupados[cat] = produtos_desta_categoria
 
-    # --- 2. CORREÇÃO DO MENU SIDENAV ---
-    # (Removido "Meus Agendamentos")
     links_sidenav = [
         {"url": url_for('home.painel_usuario'), "titulo": "Inicial", "ativo": False},
         {"url": url_for('feira.selecionar_feira'), "titulo": "Agendar Feira", "ativo": False},
@@ -48,7 +42,7 @@ def lista_produtos():
         menu=links_sidenav
     )
 
-# --- Rota criar o form para produtos ---
+#Rota de criação do formulario dos produtos
 @produto_route.route('/form', defaults={'produto_id': None}, methods=["GET"])
 @produto_route.route('/form/<int:produto_id>', methods=["GET"])
 def form_produto(produto_id):
@@ -76,7 +70,7 @@ def form_produto(produto_id):
         unidades=UNIDADES
         )
 
-# --- Rota processar o form ---
+#Rota para salvar o formulario
 @produto_route.route('/form', defaults={'produto_id': None}, methods=["POST"])
 @produto_route.route('/form/<int:produto_id>', methods=["POST"])
 def processar_form_produto(produto_id):
@@ -124,7 +118,7 @@ def processar_form_produto(produto_id):
 
     return redirect(url_for('produto.lista_produtos'))
 
-# --- 3. CORREÇÃO DA ROTA DELETAR ---
+#Rota Deletar
 @produto_route.route('/delete/<int:produto_id>', methods=["POST"])
 def deletar_produto(produto_id):
     if 'usuario_id' not in session:
@@ -138,22 +132,22 @@ def deletar_produto(produto_id):
         flash("Erro ao deletar produto.", "error")
         return redirect(url_for('produto.lista_produtos'))
     
-    # --- NOVA LÓGICA DE VERIFICAÇÃO ---
+   
     is_agendado = False
     for agendamento in FEIRANTE_AGENDA:
-        # Verifica se o produto está na lista de agendamentos deste usuário
+   
         if (agendamento.get('usuario_id') == id_logado and 
             agendamento.get('status') == 'pendente' and
             produto_id in agendamento.get('produtos_selecionados', [])):
             
             is_agendado = True
-            break # Encontrou, não precisa de procurar mais
+            break 
     
     if is_agendado:
-        # Se está agendado, NÃO deixa apagar
+        
         flash(f"O produto '{produto.get('nome')}' não pode ser deletado, pois está incluído num agendamento pendente. Cancele o agendamento primeiro.", "error")
     else:
-        # Se não está agendado, apaga
+        
         PRODUTOS.remove(produto)
         flash("Produto deletado com sucesso.", "success")
         

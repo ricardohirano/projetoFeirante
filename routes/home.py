@@ -8,7 +8,7 @@ from routes.usuario import buscar_usuario_por_id, buscar_usuario_por_email
 
 home_route = Blueprint('home', __name__)
 
-# --- Rota Login (GET/POST) ---
+#Rota login
 @home_route.route('/', methods=["GET","POST"])
 def login_feirante():
     if request.method == "POST":
@@ -27,7 +27,7 @@ def login_feirante():
         return redirect(url_for('home.painel_usuario'))
     return render_template("loginFeirante.html")
 
-# --- Rota esqueci a senha (Fluxograma - Tela 1) ---
+# Rota esqueci a senha
 @home_route.route('/esqueciSenha', methods=["GET","POST"])
 def esqueci_senha():
     if request.method == "POST":
@@ -42,7 +42,7 @@ def esqueci_senha():
             return render_template('esqueci_senha.html')
     return render_template('esqueci_senha.html')
 
-# --- Rota para redefinir a senha (Fluxograma - Tela 2) ---
+#Rota redefinir senha
 @home_route.route('/redifinir-senha', methods=["GET", "POST"])
 def redefinir_senha():
     if 'email_para_redefinir' not in session:
@@ -73,7 +73,7 @@ def redefinir_senha():
 
     return render_template("redefinir_senha.html")
 
-# --- Rota do painel (Inicial) ---
+#Rota painel do feirante
 @home_route.route("/painel")
 def painel_usuario():
     if 'usuario_id' not in session:
@@ -93,8 +93,7 @@ def painel_usuario():
         "dias_premium": 0
     }
 
-    # --- CORREÇÃO DO MENU SIDENAV ---
-    # (Removido "Meus Agendamentos")
+   
     links_sidenav = [
         {"url": url_for('home.painel_usuario'), "titulo": "Inicial", "ativo": True},
         {"url": url_for('feira.selecionar_feira'), "titulo": "Agendar Feira", "ativo": False},
@@ -109,7 +108,7 @@ def painel_usuario():
         menu = links_sidenav
     )
 
-# --- ROTA: DADOS DO USUÁRIO ---
+#Rota de dados do usuario
 @home_route.route("/dados-usuario", methods=["GET","POST"])
 def dados_usuarios():
     if 'usuario_id' not in session:
@@ -133,8 +132,7 @@ def dados_usuarios():
         flash("Dados atualizados com sucesso!", "success")
         return redirect(url_for('home.dados_usuarios'))
 
-    # --- CORREÇÃO DO MENU SIDENAV ---
-    # (Removido "Meus Agendamentos")
+ 
     links_sidenav = [
         {"url": url_for('home.painel_usuario'), "titulo": "Inicial", "ativo": False},
         {"url": url_for('feira.selecionar_feira'), "titulo": "Agendar Feira", "ativo": False},
@@ -148,7 +146,7 @@ def dados_usuarios():
         menu = links_sidenav
     )
 
-# --- ROTA: MUDAR SENHA ---
+#Rota mudar senha
 @home_route.route('/mudar-senha', methods=["GET", "POST"])
 def mudar_senha():
     if 'usuario_id' not in session:
@@ -183,7 +181,7 @@ def mudar_senha():
 
     return render_template("mudar_senha.html")
 
-# --- Rota de logout ---
+# rota Logout
 @home_route.route("/logout")
 def logout():
     session.pop('usuario_id', None)

@@ -29,6 +29,12 @@ def selecionar_feira():
             data_obj = datetime.strptime(data_str, '%Y-%m-%d')
             dia_semana_escolhido = data_obj.weekday() 
             feira = buscar_feira_por_id(feira_id)
+            
+            # --- Verificação de segurança ---
+            if not feira:
+                flash("Feira não encontrada.", "error")
+                return redirect(url_for('feira.selecionar_feira'))
+                
             dia_semana_requerido = feira.get("dia_semana_num")
             if dia_semana_escolhido != dia_semana_requerido:
                 dia_requerido_nome = DIAS_SEMANA_MAP[dia_semana_requerido]
@@ -36,8 +42,9 @@ def selecionar_feira():
                 data_formatada_flash = data_obj.strftime('%d/%m/%Y')
                 flash(f"Data inválida! A '{feira['nome']}' só acontece às {dia_requerido_nome}s, mas a data {data_formatada_flash} é uma {dia_escolhido_nome}.", "error")
                 return redirect(url_for('feira.selecionar_feira'))
-        except ValueError:
-            flash("Formato de data inválido.", "error")
+
+        except (ValueError, TypeError): # TypeError apanha o 'feira.get' se a feira for None
+            flash("Formato de data ou feira inválido.", "error")
             return redirect(url_for('feira.selecionar_feira'))
         
         session['feira_agendamento_temp'] = {
@@ -47,11 +54,10 @@ def selecionar_feira():
         
         return redirect(url_for('feira.selecionar_produtos'))
 
-    # --- ATUALIZAÇÃO DO MENU SIDENAV ---
-    # (Removido "Meus Agendamentos")
     links_sidenav = [
         {"url": url_for('home.painel_usuario'), "titulo": "Inicial", "ativo": False},
-        {"url": url_for('feira.selecionar_feira'), "titulo": "Feiras", "ativo": True},
+        {"url": url_for('feira.selecionar_feira'), "titulo": "Agendar Feira", "ativo": True},
+        {"url": url_for('feira.minhas_feiras'), "titulo": "Meus Agendamentos", "ativo": False},
         {"url": url_for('produto.lista_produtos'), "titulo": "Produtos", "ativo": False},
         {"url": url_for('home.dados_usuarios'), "titulo": "Dados Usuarios", "ativo": False}
     ]
@@ -80,6 +86,12 @@ def selecionar_produtos():
     id_logado = session['usuario_id']
     feira_info = buscar_feira_por_id(agendamento_temp['feira_id'])
     
+    # --- CORREÇÃO (Verificação de segurança) ---
+    if not feira_info:
+        flash("A feira selecionada não existe mais. Por favor, comece de novo.", "error")
+        session.pop('feira_agendamento_temp', None)
+        return redirect(url_for('feira.selecionar_feira'))
+        
     data_str = agendamento_temp['data']
     data_obj = datetime.strptime(data_str, '%Y-%m-%d')
     data_formatada = data_obj.strftime('%d/%m/%Y')
@@ -113,7 +125,6 @@ def preview_agendamento():
         return redirect(url_for("home.login_feirante"))
 
     id_logado = session['usuario_id']
-    
     agendamento_temp = session.get('feira_agendamento_temp')
     if not agendamento_temp:
         return redirect(url_for('feira.selecionar_feira'))
@@ -127,6 +138,12 @@ def preview_agendamento():
     usuario_info = buscar_usuario_por_id(id_logado)
     feira_info = buscar_feira_por_id(agendamento_temp['feira_id'])
     
+    # --- CORREÇÃO (Verificação de segurança) ---
+    if not feira_info or not usuario_info:
+        flash("Erro ao processar o seu pedido. Tente novamente.", "error")
+        session.pop('feira_agendamento_temp', None)
+        return redirect(url_for('feira.selecionar_feira'))
+        
     data_obj = datetime.strptime(agendamento_temp['data'], '%Y-%m-%d')
     data_formatada = data_obj.strftime('%d/%m/%Y')
 
@@ -157,20 +174,28 @@ def salvar_agendamento_final():
         return redirect(url_for("home.login_feirante"))
 
     id_logado = session['usuario_id']
-    
     agendamento_final = session.get('feira_agendamento_temp')
     if not agendamento_final:
         return redirect(url_for('feira.selecionar_feira'))
 
-    # Salva no "banco de dados"
+    # --- CORREÇÃO (Verificação de segurança) ---
+    feira_info = buscar_feira_por_id(agendamento_final['feira_id'])
+    produtos_lista_copiada = buscar_produtos_por_ids(agendamento_final['produtos_ids'])
+    
+    if not feira_info:
+        flash("Erro: A feira que você tentou agendar não existe mais.", "error")
+        return redirect(url_for('feira.selecionar_feira'))
+        
+    produtos_snapshot = [p.copy() for p in produtos_lista_copiada]
+
     ultimo_id = FEIRANTE_AGENDA[-1]["id_agenda"] if FEIRANTE_AGENDA else 0
     novo_agendamento = {
         "id_agenda": ultimo_id + 1,
         "usuario_id": id_logado,
         "feira_id": agendamento_final['feira_id'],
         "data_escolhida": agendamento_final['data'],
-        "produtos_selecionados": agendamento_final['produtos_ids'],
-        "status": "pendente"
+        "status": "pendente",
+        "produtos_snapshot": produtos_snapshot
     }
     FEIRANTE_AGENDA.append(novo_agendamento)
     
@@ -187,7 +212,7 @@ def cancelar_agendamento_final():
     return redirect(url_for('home.painel_usuario'))
 
 
-# --- ROTA 6: PÁGINA "Meus Agendamentos" ---
+# --- ROTA 6: PÁGINA "Meus Agendamentos" (COM A CORREÇÃO) ---
 @feira_route.route('/minhas-feiras', methods=["GET"])
 def minhas_feiras():
     if 'usuario_id' not in session:
@@ -196,15 +221,27 @@ def minhas_feiras():
         
     id_logado = session['usuario_id']
     usuario_info = buscar_usuario_por_id(id_logado)
+    
+    # --- CORREÇÃO (Verificação de segurança) ---
+    if not usuario_info:
+        session.pop('usuario_id', None)
+        flash("Usuário não encontrado. Faça login novamente.", "error")
+        return redirect(url_for("home.login_feirante"))
 
     agendamentos_pendentes = []
     for agendamento in FEIRANTE_AGENDA:
         if (agendamento.get('usuario_id') == id_logado and
             agendamento.get('status') == 'pendente'):
             
+            # --- A CORREÇÃO ESTÁ AQUI ---
             feira_info = buscar_feira_por_id(agendamento['feira_id'])
-            # --- CORREÇÃO: Lê os produtos do SNAPSHOT ---
-            produtos_lista = agendamento.get('produtos_snapshot', []) 
+            
+            # Se a feira_info for 'None' (ex: foi apagada), 
+            # nós não "crashamos". Nós saltamos este agendamento.
+            if not feira_info:
+                continue # Salta para o próximo agendamento no loop
+            
+            produtos_lista = agendamento.get('produtos_snapshot', [])
             data_obj = datetime.strptime(agendamento['data_escolhida'], '%Y-%m-%d')
             data_formatada = data_obj.strftime('%d/%m/%Y')
             
@@ -216,17 +253,16 @@ def minhas_feiras():
             
             agendamentos_pendentes.append({
                 "id_agenda": agendamento['id_agenda'],
-                "feira": feira_info,
+                "feira": feira_info, # Agora temos a certeza que 'feira_info' não é 'None'
                 "data": data_formatada,
                 "usuario": usuario_info,
                 "produtos_agrupados": produtos_agrupados
             })
 
-    # --- ATUALIZAÇÃO DO MENU SIDENAV ---
-    # (Removido "Meus Agendamentos" e corrigido "ativo")
     links_sidenav = [
         {"url": url_for('home.painel_usuario'), "titulo": "Inicial", "ativo": False},
-        {"url": url_for('feira.selecionar_feira'), "titulo": "Feiras", "ativo": True}, # A "mãe" está ativa
+        {"url": url_for('feira.selecionar_feira'), "titulo": "Agendar Feira", "ativo": False},
+        {"url": url_for('feira.minhas_feiras'), "titulo": "Meus Agendamentos", "ativo": True},
         {"url": url_for('produto.lista_produtos'), "titulo": "Produtos", "ativo": False},
         {"url": url_for('home.dados_usuarios'), "titulo": "Dados Usuarios", "ativo": False}
     ]

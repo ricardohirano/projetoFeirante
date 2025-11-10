@@ -6,7 +6,7 @@
     <title>Meus Agendamentos</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-    <!-- Usa o 'alert()' como preferiu -->
+   
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <script>
@@ -22,25 +22,13 @@
 </head>
 <body>
     <div>
-        <!-- Coluna 1: Barra Lateral (Sidenav) -->
+   
         <nav>
-            <button 
-              type="button" 
-              onclick="window.location.href='{{ url_for('home.logout') }}'"
-            >
-                ← Voltar Login (Sair)
-            </button>
-            
+            <button type="button" onclick="window.location.href='{{ url_for('home.logout') }}'">← Voltar</button>
             <hr>
-            
-            <!-- Menu lateral com botões -->
             <div>
                 {% for link in menu %}
-                    <button 
-                      type="button" 
-                      onclick="window.location.href='{{ link.url }}'"
-                      {{ 'disabled' if link.ativo else '' }}
-                    >
+                    <button type="button" onclick="window.location.href='{{ link.url }}'" {{ 'disabled' if link.ativo else '' }} >
                         {{ link.titulo }}
                     </button>
                     <br> 
@@ -50,70 +38,47 @@
         
         <hr>
         
-        <!-- Coluna 2: Conteúdo Principal -->
+     
         <main>
             <h1>Meus Agendamentos</h1>
-            <p>
-              Abaixo estão os seus agendamentos de feira que 
-              estão aguardando a aprovação de um moderador.
-            </p>
+            <p>Abaixo estão os seus agendamentos de feira que estão aguardando a aprovação de um moderador.</p>
             <hr>
 
-            <!-- 
-              Loop principal: Passa por cada agendamento 
-              que o backend (Python) enviou
-            -->
             {% for item in agendamentos %}
-            
-                <!-- 
-                  Usamos o mesmo layout do 'preview_agendamento.html'
-                  para mostrar o card
-                -->
                 <div style="border: 2px solid #ccc; border-radius: 8px; padding: 20px; margin: 20px 0;">
-                    
                     <h2>{{ item.usuario.get('nome_fantasia', 'Minha Barraca') }}</h2>
-                    
                     <hr>
-                    
                     <h4>Dados do Feirante:</h4>
                     <p><b>Telefone:</b> {{ item.usuario.get('telefone', '(Não cadastrado)') }}</p>
                     <p><b>Bio:</b> {{ item.usuario.get('bio', '(Sem biografia)') }}</p>
-                    
                     <hr>
-                    
                     <h4>Feira Selecionada:</h4>
                     <p><b>Nome:</b> {{ item.feira.nome }}</p>
                     <p><b>Data:</b> {{ item.data }}</p>
                     <p><b>Horário:</b> {{ item.feira.horario }}</p>
                     <p><b>Local:</b> {{ item.feira.endereco }}</p>
-                    
                     {% if item.feira.mapa_embed_url %}
                         <iframe 
                           src="{{ item.feira.mapa_embed_url }}" 
-                          width="100%" 
-                          height="300" 
+                          width="25%" 
+                          height="200" 
                           style="border:0;" 
                           allowfullscreen="" 
                           loading="lazy" 
                           referrerpolicy="no-referrer-when-downgrade"
                         ></iframe>
                     {% endif %}
-
                     <hr>
-
-                    <h3>Produtos Selecionados:</h3>
-                    
+                    <h3>Produtos Selecionados:</h3>                    
                     {% for categoria, lista_de_produtos in item.produtos_agrupados.items() %}
                         <h2 style="text-transform: capitalize;">{{ categoria }}</h2>
                         <div class="container-produtos">
                             {% for p in lista_de_produtos %}
                                 <div class="card-produto">
-                                    <img 
-                                      src="{{ p.get('imagem_url', 'https://placehold.co/150x100/eeeeee/cccccc?text=Sem+Foto') }}" 
-                                      alt="{{ p.nome }}"
-                                    >
+                                    <img src="{{ p.get('imagem_url', 'https://placehold.co/150x100/eeeeee/cccccc?text=Sem+Foto') }}"  alt="{{ p.nome }}">
                                     <h4>{{ p.nome }}</h4>
-                                    <p>{{ p.unidade }} R$ {{ p.preco }}</p>
+                                    <p> R$ {{ p.preco }}</p>
+                                    <p>{{ p.unidade }}</p>
                                 </div>
                             {% endfor %}
                         </div>
@@ -122,11 +87,6 @@
                         <p>Você não selecionou nenhum produto para esta feira.</p>
                     {% endfor %}
 
-                    <hr>
-                    <!-- 
-                      *** A SUA NOVA LÓGICA ***
-                      Mostra o status e o botão "Cancelar"
-                    -->
                     <h3>Status: Aguardando Aprovação do Moderador</h3>
                     
                     <form 
@@ -134,20 +94,13 @@
                       method="POST" 
                       style="display: inline;"
                     >
-                        <button 
-                          type="submit"
-                          onclick="return confirm('Tem certeza que deseja cancelar este agendamento?');"
-                        >
-                            Cancelar Agendamento
-                        </button>
+                        <button type="submit" onclick="return confirm('Tem certeza que deseja cancelar este agendamento?');">Cancelar</button>
                     </form>
                 </div>
 
             {% else %}
                 <p>Você não tem nenhum agendamento pendente de aprovação.</p>
-            {% endfor %}
-            <!-- Fim do loop principal -->
-
+            {% endfor %}            
         </main>
     </div>
 </body>
